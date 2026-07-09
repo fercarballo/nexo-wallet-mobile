@@ -1,0 +1,38 @@
+# Ejecutor real de CI (el repositorio se aloja en GitHub).
+#
+# IMPORTANTE: este pipeline corre la suite en MODO SIMULADO (sin emulador Android). Verifica los
+# escenarios de negocio, el cableado de la suite y la construcción de las capabilities de Appium.
+# NO ejecuta la app en un dispositivo real: eso requiere un runner con Android SDK + emulador y se
+# corre bajo demanda (ver docs/runbooks/local-setup.md). No se presenta como si lo hiciera.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  simulated:
+    name: Suite BDD (modo simulado) + capabilities de Appium
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Tests (modo simulado)
+        run: mvn -B test
+
+      - name: Publicar reporte de Cucumber
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: target/cucumber/
+          if-no-files-found: ignore

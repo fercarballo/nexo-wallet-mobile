@@ -1,0 +1,18 @@
+# Build
+target/
+*.class
+
+# APKs / binarios (no versionar; ver .env.example para dónde ubicarlos)
+*.apk
+apps/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# SO
+.DS_Store
+
+# Env
+.env

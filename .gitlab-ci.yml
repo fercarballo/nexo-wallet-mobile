@@ -1,0 +1,41 @@
+# Pipeline — GitLab CI (definición portable para entornos GitLab).
+#
+# La ejecución REAL de CI corre en GitHub Actions (.github/workflows/ci.yml), ya que el repo se
+# aloja en GitHub. Este archivo documenta el pipeline equivalente para GitLab; no se ejecuta
+# automáticamente sobre el mismo commit, evitando correr la batería por duplicado.
+#
+# El job `simulated` no necesita emulador. El job `real` queda como MANUAL: requiere un runner con
+# Android SDK, emulador y Appium (ver docs/runbooks/local-setup.md).
+image: maven:3.9-eclipse-temurin-21
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .m2/repository
+
+stages:
+  - test
+
+simulated:
+  stage: test
+  script:
+    - mvn -B test
+  artifacts:
+    when: always
+    paths:
+      - target/cucumber/
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+
+# Requiere un runner con emulador Android + Appium. Se dispara a mano, nunca automáticamente.
+real-device:
+  stage: test
+  when: manual
+  allow_failure: true
+  tags:
+    - android-emulator
+  script:
+    - mvn -B test -DwalletMode=appium

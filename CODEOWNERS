@@ -1,0 +1,6 @@
+# Propietarios del código. Todo PR requiere su revisión.
+*                                             @fercarballo
+
+# Núcleo del framework (abstracción y ambas implementaciones):
+/src/main/java/com/nexo/wallet/               @fercarballo
+/.github/                                     @fercarballo
